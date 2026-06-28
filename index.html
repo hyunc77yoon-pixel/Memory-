@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>메모리 기술 인텔리전스 대시보드</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f6f9; color: #1a1a2e; font-size: 14px; }
+
+  header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 20px 28px; display: flex; justify-content: space-between; align-items: center; }
+  header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  header h1 span { color: #4fc3f7; }
+  .header-meta { text-align: right; font-size: 12px; opacity: 0.75; }
+  .header-meta strong { display: block; font-size: 13px; opacity: 1; color: #b2ebf2; }
+
+  .tabs { background: white; border-bottom: 1px solid #e0e0e0; display: flex; padding: 0 28px; gap: 0; overflow-x: auto; }
+  .tab { padding: 12px 18px; cursor: pointer; font-size: 13px; font-weight: 500; color: #666; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+  .tab.active { color: #1565c0; border-bottom-color: #1565c0; }
+  .tab:hover:not(.active) { color: #333; background: #f9f9f9; }
+
+  .content { padding: 20px 28px; max-width: 1200px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  .card { background: white; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .card-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 10px; }
+  .card-value { font-size: 26px; font-weight: 700; color: #1a1a2e; }
+  .card-sub { font-size: 12px; color: #888; margin-top: 4px; }
+  .card-badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: 6px; }
+  .badge-green { background: #e8f5e9; color: #2e7d32; }
+  .badge-blue { background: #e3f2fd; color: #1565c0; }
+  .badge-orange { background: #fff3e0; color: #e65100; }
+  .badge-red { background: #fce4ec; color: #c62828; }
+
+  .panel { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 16px; }
+  .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .panel-title { font-size: 14px; font-weight: 700; color: #1a1a2e; }
+  .panel-tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #f8f9fa; padding: 9px 12px; text-align: left; font-weight: 600; color: #555; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid #e8e8e8; }
+  td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; color: #333; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafbff; }
+
+  .tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+  .tag-patent { background: #e8eaf6; color: #3949ab; }
+  .tag-paper { background: #f3e5f5; color: #7b1fa2; }
+  .tag-product { background: #e0f2f1; color: #00695c; }
+
+  .timeline { position: relative; padding-left: 20px; }
+  .timeline::before { content: ''; position: absolute; left: 6px; top: 4px; bottom: 4px; width: 2px; background: #e0e0e0; }
+  .timeline-item { position: relative; margin-bottom: 14px; }
+  .timeline-item::before { content: ''; position: absolute; left: -16px; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: #1565c0; border: 2px solid white; box-shadow: 0 0 0 2px #1565c0; }
+  .timeline-date { font-size: 11px; color: #888; font-weight: 600; }
+  .timeline-content { font-size: 13px; color: #333; line-height: 1.5; margin-top: 2px; }
+  .timeline-content strong { color: #1a1a2e; }
+
+  .source-list { list-style: none; }
+  .source-list li { padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
+  .source-list li:last-child { border-bottom: none; }
+  .source-list a { color: #1565c0; text-decoration: none; }
+  .source-list a:hover { text-decoration: underline; }
+  .source-list .src-type { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 3px; margin-right: 6px; background: #f0f0f0; color: #666; }
+
+  .info-bar { background: #e8f5e9; border-radius: 8px; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .info-bar span { font-size: 13px; color: #2e7d32; }
+  .info-bar a { color: #1565c0; font-weight: 600; text-decoration: none; }
+  .info-bar a:hover { text-decoration: underline; }
+
+  .roadmap-row { display: grid; grid-template-columns: 100px 1fr; gap: 12px; align-items: start; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+  .roadmap-row:last-child { border-bottom: none; }
+  .roadmap-year { font-size: 13px; font-weight: 700; color: #1565c0; }
+  .roadmap-items { display: flex; flex-wrap: wrap; gap: 6px; }
+  .roadmap-chip { font-size: 12px; padding: 3px 10px; border-radius: 20px; background: #f0f4ff; color: #3949ab; border: 1px solid #c5cae9; }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .content { padding: 16px; }
+    header { flex-direction: column; gap: 8px; }
+    .header-meta { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🧠 메모리 기술 인텔리전스 <span>대시보드</span></h1>
+    <div style="font-size:12px;opacity:0.6;margin-top:4px;">DRAM · 3D IC · 특허 · 논문 추적</div>
+  </div>
+  <div class="header-meta">
+    <strong>최종 업데이트: 2026-06-28 (화웨이 τ 스케일링 추가)</strong>
+    다음 업데이트: 매주 월요일
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('cxmt', event)">CXMT Commodity DRAM</div>
+  <div class="tab" onclick="showTab('3dic', event)">중국 3D IC</div>
+  <div class="tab" onclick="showTab('patents', event)">특허 트래커</div>
+  <div class="tab" onclick="showTab('papers', event)">논문 트래커</div>
+  <div class="tab" onclick="showTab('roadmap', event)">기술 로드맵</div>
+  <div class="tab" onclick="showTab('tau', event)" style="color:#c62828;font-weight:700">🆕 화웨이 τ 스케일링</div>
+</div>
+
+<div class="content">
+
+  <div class="info-bar">
+    <span>📡 이 대시보드는 매주 월요일 업데이트됩니다. 즉시 업데이트는 <a href="https://claude.ai" target="_blank">Claude (Cowork)</a>에서 "대시보드 업데이트해줘"라고 요청하세요.</span>
+  </div>
+
+  <!-- TAB 1: CXMT -->
+  <div id="tab-cxmt" class="section active">
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">현재 양산 노드</div>
+        <div class="card-value">G3</div>
+        <div class="card-sub">17~17.5nm · 6F² BWL</div>
+        <span class="card-badge badge-green">양산 중</span>
+      </div>
+      <div class="card">
+        <div class="card-title">차세대 노드</div>
+        <div class="card-value">G4</div>
+        <div class="card-sub">~16nm · cell 0.0020µm² (G3 대비 -20%)</div>
+        <span class="card-badge badge-orange">2026년 양산 예정</span>
+      </div>
+      <div class="card">
+        <div class="card-title">글로벌 점유율 (2026 Q1)</div>
+        <div class="card-value">11.1%</div>
+        <div class="card-sub">생산능력 기준 · 글로벌 4위</div>
+        <span class="card-badge badge-blue">Samsung·SK·Micron 다음</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">제품 라인업 현황</div>
+        <span class="panel-tag badge-green">2023~2026</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th>제품</th><th>속도</th><th>밀도</th><th>노드</th><th>출시</th><th>비고</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>LPDDR5</td><td>6,400 MT/s</td><td>12Gb</td><td>G3 (17.5nm)</td><td>2023-11</td><td>On-die ECC 탑재</td></tr>
+          <tr><td>DDR5</td><td>8,000 MT/s</td><td>16Gb / 24Gb</td><td>G4 (~16nm)</td><td>IC China 2025-11 발표</td><td>2026년 양산 예정</td></tr>
+          <tr><td>LPDDR5X</td><td>10,667 MT/s</td><td>12Gb / 16Gb</td><td>G4 (~16nm)</td><td>IC China 2025-11 발표</td><td>서버·AI용 MRDIMM 포함</td></tr>
+          <tr><td>HBM2</td><td>—</td><td>—</td><td>G3 기반</td><td>2024 H2 양산 시작</td><td>~5 kwspm (2025년 말)</td></tr>
+          <tr><td>HBM3</td><td>—</td><td>—</td><td>G4 기반</td><td>2026년 말 목표</td><td>YMTC Xtacking 협력</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">셀 구조 기술 기반</div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">기원</div>
+          <div class="timeline-content"><strong>Qimonda BWL 46nm 라이선스</strong> (Polaris Innovations 통해 취득) → 6F² Buried Word Line 기반. CXMT 기술의 출발점.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">G1~G3</div>
+          <div class="timeline-content"><strong>46nm → 17.5nm 스케일링.</strong> BWL trench 제조, gate oxide, bit line contact 중심 특허 출원. TiN/W bWL 구조 유지.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">G4 (현재)</div>
+          <div class="timeline-content"><strong>~16nm, cell 0.0020µm².</strong> EUV 미사용 (DUV 다중 패터닝). 캐패시터 유전체: TiN/ZrO2/TiN MIM 추정 (유료 TechInsights 역설계 필요).</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">G5+ (추정)</div>
+          <div class="timeline-content">EUV 도입 시점 미정. IGZO 수직 채널 또는 4F² 전환 연구 중 (IMECAS, Tsinghua 협력 추정). 64층 3D DRAM 목표 (현재 5층 시제품).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: 3D IC -->
+  <div id="tab-3dic" class="section">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">YMTC Hybrid Bonding 특허</div>
+        <div class="card-value">119건</div>
+        <div class="card-sub">2017~2024.01 기준 (KnowMade 집계)</div>
+        <span class="card-badge badge-red">Samsung 라이선스 체결 2025-02</span>
+      </div>
+      <div class="card">
+        <div class="card-title">중국 3D DRAM 연구 기관</div>
+        <div class="card-value">4+</div>
+        <div class="card-sub">Huawei · IMECAS · Tsinghua · CXMT</div>
+        <span class="card-badge badge-blue">IGZO 수직 채널 공통 방향</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">중국 3D IC 플레이어별 기술 현황</div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>플레이어</th><th>접근법</th><th>IP/논문</th><th>현황</th><th>목표</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>YMTC</strong></td>
+            <td>Hybrid Bonding (Xtacking)</td>
+            <td>119건 특허, KnowMade 분석<br><span class="tag tag-patent">특허</span></td>
+            <td><span class="card-badge badge-green">업계 핵심 IP 보유</span></td>
+            <td>CXMT HBM 협력 공급</td>
+          </tr>
+          <tr>
+            <td><strong>CXMT</strong></td>
+            <td>TSV + YMTC Xtacking 협력</td>
+            <td>HBM 패키징 특허 출원 초기<br><span class="tag tag-patent">특허</span></td>
+            <td><span class="card-badge badge-orange">HBM3 개발 중</span></td>
+            <td>HBM3 2026년 말 양산</td>
+          </tr>
+          <tr>
+            <td><strong>Huawei</strong></td>
+            <td>Vertical CAA-IGZO FET</td>
+            <td>VLSI Symposium 2022<br><span class="tag tag-paper">논문</span></td>
+            <td><span class="card-badge badge-blue">연구 단계</span></td>
+            <td>3D DRAM 상용화 미정</td>
+          </tr>
+          <tr>
+            <td><strong>IMECAS</strong><br>(中科院微电子所)</td>
+            <td>2T0C IGZO, 4F² 수직 채널</td>
+            <td>2021년~ 다수 논문<br>수직 IGZO 채널 최초 시연<br><span class="tag tag-paper">논문</span></td>
+            <td><span class="card-badge badge-blue">선도 연구</span></td>
+            <td>캐패시터리스 DRAM</td>
+          </tr>
+          <tr>
+            <td><strong>Tsinghua Univ.</strong></td>
+            <td>Monolithic 3D CIM</td>
+            <td>IEDM 2023 (CAA-IGZO 4F² 2T0C)<br>IEDM 2024 (M3D-MP4 4-layer)<br><span class="tag tag-paper">논문</span></td>
+            <td><span class="card-badge badge-blue">IEDM 발표</span></td>
+            <td>CIM 118.74× 속도 향상</td>
+          </tr>
+          <tr>
+            <td><strong>XMC</strong><br>(YMTC 계열 파운드리)</td>
+            <td>TSV 공정</td>
+            <td>YMTC IP 활용<br><span class="tag tag-patent">특허</span></td>
+            <td><span class="card-badge badge-orange">HBM 패키징 개발 중</span></td>
+            <td>CXMT HBM 후공정</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">핵심 인사이트</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:#fff3e0;border-radius:8px;padding:12px 14px;border-left:3px solid #f57c00">
+          <strong style="color:#e65100">⚠️ YMTC IP 리스크</strong><br>
+          <span style="font-size:13px;color:#555">Hybrid bonding 119건 보유, Samsung도 라이선스 체결. HBM4E 이상 필수 기술. 한국/미국 업체 모두 YMTC IP에 의존하는 구조.</span>
+        </div>
+        <div style="background:#e8f5e9;border-radius:8px;padding:12px 14px;border-left:3px solid #388e3c">
+          <strong style="color:#2e7d32">✅ 중국의 전략적 우위</strong><br>
+          <span style="font-size:13px;color:#555">IGZO/산화물 반도체 기반 수직 채널 트랜지스터 — 리소그래피 의존도 낮아 수출 규제 우회 가능. IMECAS·Tsinghua가 2021년부터 선점.</span>
+        </div>
+        <div style="background:#e3f2fd;border-radius:8px;padding:12px 14px;border-left:3px solid #1976d2">
+          <strong style="color:#1565c0">📌 조사 필요 항목</strong><br>
+          <span style="font-size:13px;color:#555">TechInsights G4 역설계 보고서 (capacitor height, EOT 수치), CNIPA CXMT 원문 특허 전수 조회, arXiv 2603.12461 전문 검토.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: 특허 트래커 -->
+  <div id="tab-patents" class="section">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">CXMT 확인 특허 (US/CN, 2020~2026)</div>
+        <span class="panel-tag badge-blue">Google Patents / USPTO 기반</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th>특허번호</th><th>제목</th><th>우선권(CN)</th><th>기술 영역</th><th>상태</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><a href="https://patents.google.com/patent/US12041764" target="_blank">US12041764</a></td><td>Method for manufacturing buried word line transistor</td><td>CN202010974520.8 (2020-09)</td><td>BWL 트랜지스터</td><td><span class="tag tag-patent">등록</span></td></tr>
+          <tr><td><a href="https://patents.google.com/patent/US11856754" target="_blank">US11856754</a></td><td>Semiconductor structure and manufacturing method thereof</td><td>CN202210010116.8 (2022-01)</td><td>반도체 구조</td><td><span class="tag tag-patent">등록</span></td></tr>
+          <tr><td><a href="https://patents.google.com/patent/US12048145" target="_blank">US12048145</a></td><td>Method of manufacturing semiconductor structure</td><td>CN202110226661.6 (2021-03)</td><td>제조 공정</td><td><span class="tag tag-patent">등록</span></td></tr>
+          <tr><td><a href="https://patents.google.com/patent/US12336170" target="_blank">US12336170</a></td><td>Semiconductor structure having two word lines</td><td>CN202210556171.7 (2022-05)</td><td>듀얼 워드라인</td><td><span class="tag tag-patent">등록</span></td></tr>
+          <tr><td><a href="https://patents.google.com/patent/US12490423" target="_blank">US12490423</a></td><td>Semiconductor structure and method</td><td>CN202210446041.8 (2022-04)</td><td>반도체 구조</td><td><span class="tag tag-patent">등록</span></td></tr>
+          <tr><td><a href="https://patents.google.com/patent/US11862281" target="_blank">US11862281</a></td><td>Word line lead-out structure and method</td><td>CN202010468064.X (2020-05)</td><td>워드라인 인출</td><td><span class="tag tag-patent">등록</span></td></tr>
+          <tr><td><a href="https://patents.google.com/patent/US12279417" target="_blank">US12279417</a></td><td>Semiconductor structure and manufacturing method</td><td>CN 우선권 (2022)</td><td>반도체 구조</td><td><span class="tag tag-patent">등록</span></td></tr>
+          <tr><td><a href="https://patents.google.com/patent/US20240096691A1" target="_blank">US20240096691A1</a></td><td>Semiconductor structure and method for manufacturing</td><td>CN202210132370.3 (2022-02)</td><td>DRAM 셀 구조</td><td><span class="tag" style="background:#fff3e0;color:#e65100">공개</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">YMTC Hybrid Bonding 특허 (대표)</div>
+        <span class="panel-tag badge-red">119건 중 확인 가능 항목</span>
+      </div>
+      <table>
+        <thead><tr><th>기술 영역</th><th>커버리지</th><th>라이선스 현황</th><th>출처</th></tr></thead>
+        <tbody>
+          <tr><td>3D NAND/DRAM/SRAM 아키텍처</td><td>핵심 보유</td><td>Samsung 체결 (2025-02)</td><td>KnowMade / TrendForce</td></tr>
+          <tr><td>Logic+Memory die hybrid bonding</td><td>핵심 보유</td><td>업계 필수 라이선스</td><td>KnowMade</td></tr>
+          <tr><td>Peripheral circuit / bonding layer 통합</td><td>보유</td><td>—</td><td>KnowMade</td></tr>
+          <tr><td>Cu-Cu 직접 접합 (피치 &lt;10µm)</td><td>보유</td><td>CXMT 협력</td><td>Chiplet Marketplace</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;font-size:12px;color:#888">⚠️ 전체 119건 상세 분석은 KnowMade 유료 보고서 필요 (또는 Google Patents에서 assignee:YMTC 직접 조회)</div>
+    </div>
+  </div>
+
+  <!-- TAB 4: 논문 트래커 -->
+  <div id="tab-papers" class="section">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">주요 논문/발표 (2022~2026)</div>
+        <span class="panel-tag badge-blue">IEDM · VLSI · arXiv · ACS</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th>연도</th><th>컨퍼런스/저널</th><th>기관</th><th>핵심 내용</th><th>링크</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2022</td><td>VLSI Symposium</td><td>Huawei</td>
+            <td>Vertical CAA-type IGZO FET 3D DRAM. IGZO/HfO2/IZO 수직 컬럼 구조.</td>
+            <td><a href="https://www.eenewseurope.com/en/huawei-proposes-vertical-transistor-for-3d-dram/" target="_blank">EENews</a></td>
+          </tr>
+          <tr>
+            <td>2023</td><td>IEDM</td><td>Tsinghua Univ.</td>
+            <td>CAA-IGZO 4F² 2T0C 셀 수직 적층 3D eDRAM CIM</td>
+            <td>IEEE Xplore (유료)</td>
+          </tr>
+          <tr>
+            <td>2024</td><td>IEDM (세션 5-7)</td><td>Tsinghua Univ.</td>
+            <td>M3D-MP4: 4-layer Monolithic 3D CIM. Si CMOS + HfO2 RRAM + Ta2O5 RRAM + CNT CMOS. 2D 대비 118.74× 속도, GPU 대비 16.92× 에너지 절감.</td>
+            <td><a href="https://iedm24.mapyourshow.com/8_0/sessions/session-details.cfm?ScheduleID=338" target="_blank">IEDM 2024</a></td>
+          </tr>
+          <tr>
+            <td>2025</td><td>VLSI Symposium</td><td>SK Hynix</td>
+            <td>1b/1c 이후 4F2 VG(Vertical Gate) 구조 전환 선언. 1c: EUV 6레이어, 1b 대비 속도 +11% / 전력 -9%.</td>
+            <td><a href="https://news.skhynix.com/sk-hynix-presents-future-dram-technology-roadmap-at-ieee-vlsi-2025/" target="_blank">SK Hynix</a></td>
+          </tr>
+          <tr>
+            <td>2025-10</td><td>arXiv 2510.15358</td><td>중국 연구진</td>
+            <td>ALD In2O3 트랜지스터, Gated-Hall Mobility &gt;100 cm²/Vs. 3D DRAM 수직 채널 소재 후보.</td>
+            <td><a href="https://arxiv.org/pdf/2510.15358" target="_blank">arXiv</a></td>
+          </tr>
+          <tr>
+            <td>2025-12</td><td>IEDM 2025</td><td>Samsung</td>
+            <td>sub-10nm CoP 수직채널 DRAM용 아모퍼스 InGaO 트랜지스터. 채널 길이 100nm, Vt shift &lt;0.1eV.</td>
+            <td><a href="https://iedm25.mapyourshow.com/8_0/sessions/session-details.cfm?ScheduleID=211" target="_blank">IEDM 2025</a></td>
+          </tr>
+          <tr>
+            <td>2026-02</td><td>ACS Applied Elec. Mater.</td><td>KIST</td>
+            <td>"Beyond ZrO2": 루타일 TiO2 캐패시터 유전체. sub-0.3nm EOT 이론적 달성 가능.</td>
+            <td><a href="https://pubs.acs.org/doi/10.1021/acsaelm.5c02598" target="_blank">ACS</a></td>
+          </tr>
+          <tr>
+            <td>2026-03</td><td>arXiv 2603.12461</td><td>—</td>
+            <td>Monolithic 3D DRAM bitline routing + bonding pathway 공동 최적화.</td>
+            <td><a href="https://arxiv.org/pdf/2603.12461" target="_blank">arXiv</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">유료 접근 필요 소스</div></div>
+      <table>
+        <thead><tr><th>소스</th><th>내용</th><th>접근법</th><th>비용</th></tr></thead>
+        <tbody>
+          <tr><td>TechInsights</td><td>CXMT G4 역설계 (cell area, EOT, capacitor height)</td><td>개별 보고서 구매 또는 기업 구독. 무료 블로그 일부 공개.</td><td>보고서 $수백~수천</td></tr>
+          <tr><td>SemiAnalysis</td><td>CXMT 생산량·수율·IP 심층 분석</td><td>뉴스레터 구독. 일부 기사 무료.</td><td>~$500/년</td></tr>
+          <tr><td>KnowMade</td><td>YMTC hybrid bonding 119건 분석</td><td>보고서 구매</td><td>유료</td></tr>
+          <tr><td>IEEE Xplore</td><td>IEDM/VLSI 논문 전문</td><td>IEEE 구독 또는 기관 접속. 초록 무료.</td><td>기관 구독 필요</td></tr>
+          <tr><td>CNIPA 원문</td><td>CXMT 중국어 미공개 특허</td><td>Google Patents CN번호로 영문 번역 접근. 18개월 미공개분 조회 불가.</td><td>무료 (일부)</td></tr>
+          <tr><td>Patsnap</td><td>중국 특허 맵핑·분석</td><td>기업 라이선스. 무료 체험판 있음.</td><td>기업 구독</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: 화웨이 τ 스케일링 -->
+  <div id="tab-tau" class="section">
+    <div style="background:#fff3e0;border-left:4px solid #e65100;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#555">
+      <strong style="color:#e65100">📌 출처</strong>: IEEE ISCAS 2026 (상하이, 2026-05-25) · 화웨이 반도체사업부 사장 허팅보(何庭波) 기조연설 "New Semiconductor Path in Practice" · <a href="https://www.huawei.com/en/news/2026/5/ieee-iscas-tau-scaling" target="_blank">Huawei 공식 발표</a> · <strong>주의: 수치는 화웨이 자체 발표, 독립 검증 미완료</strong>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">트랜지스터 밀도 향상</div>
+        <div class="card-value">+55%</div>
+        <div class="card-sub">155 → 238 MTr/mm² (Kirin 2026 테스트 실리콘)</div>
+        <span class="card-badge badge-orange">화웨이 발표 수치</span>
+      </div>
+      <div class="card">
+        <div class="card-title">Hybrid Bonding Pitch</div>
+        <div class="card-value">1.5 µm</div>
+        <div class="card-sub">상단 금속층 피치 ~720nm · 기어비 ≈ 2</div>
+        <span class="card-badge badge-red">독립 검증 필요</span>
+      </div>
+      <div class="card">
+        <div class="card-title">2031년 목표 밀도</div>
+        <div class="card-value">14Å 동등</div>
+        <div class="card-sub">1.4nm 공정 동등 트랜지스터 밀도</div>
+        <span class="card-badge badge-blue">밀도 기준 (공정노드 ≠)</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">τ (타우) 스케일링 법칙 — 4레벨 최적화 구조</div>
+        <span class="panel-tag badge-blue">ISCAS 2026</span>
+      </div>
+      <table>
+        <thead><tr><th>레벨</th><th>τ 단위</th><th>최적화 대상</th><th>화웨이 기술</th><th>DRAM 연관성</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>소자 레벨</strong></td><td>ps (피코초)</td>
+            <td>트랜지스터 저항 · 기생 캐패시턴스</td>
+            <td>소자 설계 최적화</td>
+            <td>워드라인 RC, 셀 트랜지스터 스위칭 지연</td>
+          </tr>
+          <tr>
+            <td><strong>회로 레벨</strong></td><td>ns (나노초)</td>
+            <td>배선 RC 지연, critical path 길이</td>
+            <td><strong>LogicFolding</strong></td>
+            <td>비트라인 RC, sense amp 타이밍</td>
+          </tr>
+          <tr>
+            <td><strong>칩 레벨</strong></td><td>µs (마이크로초)</td>
+            <td>연산 + <strong>메모리 접근 지연</strong></td>
+            <td>SW/아키텍처 공동설계</td>
+            <td><strong>메모리 레이턴시가 τ의 핵심 축으로 명시</strong></td>
+          </tr>
+          <tr>
+            <td><strong>시스템 레벨</strong></td><td>s (초)</td>
+            <td>시스템 전체 E2E 응답 지연</td>
+            <td><strong>UnifiedBus</strong></td>
+            <td>Near-memory computing, CXL 유사 통합 주소 공간</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">LogicFolding — 3D 수직 접기 기술</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#888;margin-bottom:8px;text-transform:uppercase">원리</div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-date">기존 2D</div>
+              <div class="timeline-content">critical path가 수평으로 수백 µm~mm 이동 → 높은 RC 지연</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-date">LogicFolding</div>
+              <div class="timeline-content">회로를 상·하 두 웨이퍼 레이어에 분산 배치 → 수직 이동 수십 µm → RC 지연 급감</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-date">메모리 통합</div>
+              <div class="timeline-content">메모리를 logic에 hybrid bonding (1.5µm pitch)으로 직접 연결 — Memory-on-Logic 구조</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#888;margin-bottom:8px;text-transform:uppercase">Kirin 2026 테스트 수치 (화웨이 발표)</div>
+          <table>
+            <tbody>
+              <tr><td style="color:#888;font-size:12px">트랜지스터 밀도</td><td><strong>155 → 238 MTr/mm² (+55%)</strong></td></tr>
+              <tr><td style="color:#888;font-size:12px">CPU 전력 효율</td><td><strong>+41%</strong></td></tr>
+              <tr><td style="color:#888;font-size:12px">피크 CPU 주파수</td><td><strong>~3.1 GHz</strong></td></tr>
+              <tr><td style="color:#888;font-size:12px">HB pitch</td><td><strong>1.5 µm</strong></td></tr>
+              <tr><td style="color:#888;font-size:12px">상단 금속층 pitch</td><td><strong>~720 nm</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Ascend AI 칩 로드맵 — 3D IC 적용 타임라인</div>
+      </div>
+      <div class="roadmap-row"><div class="roadmap-year">2025</div><div class="roadmap-items"><span class="roadmap-chip">Ascend 910C: 칩렛 + 2.5D fan-out</span><span class="roadmap-chip">τ 법칙 적용 381개 칩 누적</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2026 Q3</div><div class="roadmap-items"><span class="roadmap-chip">Kirin 2026: LogicFolding 첫 상용 적용</span><span class="roadmap-chip">Ascend 950: micro-bump + HB 혼합</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2026 말</div><div class="roadmap-items"><span class="roadmap-chip">자체 HBM 1.6 TB/s 목표</span><span class="roadmap-chip">UnifiedBus 시스템 통합</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2030</div><div class="roadmap-items"><span class="roadmap-chip">Ascend 990: LogicFolding 완전 통합</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2031</div><div class="roadmap-items"><span class="roadmap-chip">14Å(1.4nm) 동등 밀도 목표</span><span class="roadmap-chip">EUV 없이 최첨단 노드 동등 달성 주장</span></div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">DRAM 엔지니어 관점 — 비판적 검토</div></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:#e8f5e9;border-radius:8px;padding:12px 14px;border-left:3px solid #388e3c">
+          <strong style="color:#2e7d32">✅ 기술적으로 의미 있는 부분</strong><br>
+          <span style="font-size:13px;color:#555">τ = RC를 스케일링 지표로 삼는 것은 회로 이론적으로 정확. DRAM word line delay, bit line RC, sense amp 타이밍 모두 RC 지배. 1.5µm pitch HB는 공정상 가능한 범위. 수출 규제 우회 전략(EUV 불필요)으로서 CXMT/YMTC 방향과 일치.</span>
+        </div>
+        <div style="background:#fff3e0;border-radius:8px;padding:12px 14px;border-left:3px solid #f57c00">
+          <strong style="color:#e65100">⚠️ 검증 필요 항목</strong><br>
+          <span style="font-size:13px;color:#555">
+            • 238 MTr/mm² 비교 기준 미공개 (TSMC N3E ~170 MTr/mm², N2 ~200 MTr/mm²와 비교 방법 불명)<br>
+            • "1.4nm 동등"은 공정 노드가 아닌 밀도 기준 — 혼동 주의<br>
+            • 1.5µm pitch HB 수율·신뢰성 데이터 없음 (HBM3E die-to-die ~9µm, HBM4 목표 ~3-4µm 대비)<br>
+            • Kirin 2026 출하 전 수치 — 양산 결과 독립 검증 필요
+          </span>
+        </div>
+        <div style="background:#e3f2fd;border-radius:8px;padding:12px 14px;border-left:3px solid #1976d2">
+          <strong style="color:#1565c0">📌 DRAM 설계에 주는 시사점</strong><br>
+          <span style="font-size:13px;color:#555">
+            • 메모리 접근 지연이 τ의 칩 레벨 핵심 축으로 명시 → Logic-DRAM 3D 통합 가속 시사<br>
+            • UnifiedBus의 Native Memory Semantics = DRAM bandwidth·latency가 시스템 병목 → HBM 수직 통합 방향 확정<br>
+            • 화웨이 자체 HBM 1.6 TB/s 목표 → CXMT HBM3 로드맵과 독립적 경쟁 구도<br>
+            • 6년간 381개 칩 τ 적용 → VLSI 2022 IGZO 3D DRAM과 연속선상, 메모리+로직 3D 통합 내부 축적 증거
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">출처</div></div>
+      <ul class="source-list">
+        <li><span class="src-type">공식</span><a href="https://www.huawei.com/en/news/2026/5/ieee-iscas-tau-scaling" target="_blank">Huawei 공식 발표 — ISCAS 2026 Tau Scaling Law</a></li>
+        <li><span class="src-type">기술분석</span><a href="https://globalsemiresearch.substack.com/p/huaweis-tau-scaling-law-a-technical" target="_blank">Global Semi Research — Tau Scaling Law Technical Deep Dive</a></li>
+        <li><span class="src-type">뉴스</span><a href="https://www.tomshardware.com/tech-industry/semiconductors/huawei-claims-sanctions-busting-breakthrough-with-1-4nm-class-chips-by-2031-claims-55-percent-higher-transistor-density" target="_blank">Tom's Hardware — LogicFolding +55% density, 1.4nm by 2031</a></li>
+        <li><span class="src-type">뉴스</span><a href="https://www.trendforce.com/news/2026/05/26/news-huawei-unveils-new-semiconductor-principle-tau-%CF%84-scaling-law/" target="_blank">TrendForce — Huawei Tau Scaling Law</a></li>
+        <li><span class="src-type">HBM</span><a href="https://www.tomshardware.com/tech-industry/semiconductors/huawei-unveils-ascend-roadmap-backed-by-in-house-hbm" target="_blank">Tom's Hardware — Huawei in-house HBM 1.6 TB/s roadmap</a></li>
+        <li><span class="src-type">분석</span><a href="https://augmentedmind.substack.com/p/tau-scaling-how-huawei-is-architecting-around-sanctions" target="_blank">Augmented Mind — Tau Scaling: Architecting Around Sanctions</a></li>
+        <li><span class="src-type">북경대</span><a href="https://www.tomshardware.com/tech-industry/semiconductors/peking-university-builds-3d-chip-design-tool-tailored-to-huaweis-logicfolding-architecture" target="_blank">Tom's Hardware — Peking Univ. 3D EDA tool for LogicFolding</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TAB 5: 로드맵 -->
+  <div id="tab-roadmap" class="section">
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">CXMT DRAM 기술 로드맵</div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2023</div><div class="roadmap-items"><span class="roadmap-chip">G3 양산 (17.5nm)</span><span class="roadmap-chip">LPDDR5 6,400 MT/s</span><span class="roadmap-chip">On-die ECC</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2024</div><div class="roadmap-items"><span class="roadmap-chip">HBM2 양산 시작</span><span class="roadmap-chip">G4 개발 완료</span><span class="roadmap-chip">글로벌 4위</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2025</div><div class="roadmap-items"><span class="roadmap-chip">DDR5-8000 / LPDDR5X-10667 발표</span><span class="roadmap-chip">IPO 신청 (STAR Market)</span><span class="roadmap-chip">점유율 11%</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2026</div><div class="roadmap-items"><span class="roadmap-chip">G4 양산 (예정)</span><span class="roadmap-chip">HBM3 양산 목표</span><span class="roadmap-chip">매출 $50B 예상</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2027+</div><div class="roadmap-items"><span class="roadmap-chip">HBM3E (추정)</span><span class="roadmap-chip">G5 / EUV 도입 검토</span><span class="roadmap-chip">3D DRAM 64층 목표</span></div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">글로벌 3D DRAM 기술 로드맵</div></div>
+      <div class="roadmap-row"><div class="roadmap-year">현재</div><div class="roadmap-items"><span class="roadmap-chip">HBM3E 양산 (SK·Samsung·Micron)</span><span class="roadmap-chip">6F² BWL 주류</span><span class="roadmap-chip">IGZO 연구 단계</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2026</div><div class="roadmap-items"><span class="roadmap-chip">HBM4 (hybrid bonding 본격화)</span><span class="roadmap-chip">SK Hynix 4F² VG 프로토타입</span><span class="roadmap-chip">CXMT HBM3</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2027~28</div><div class="roadmap-items"><span class="roadmap-chip">HBM4E</span><span class="roadmap-chip">4F² / VCT DRAM (Samsung·SK)</span><span class="roadmap-chip">High-NA EUV 도입</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-year">2030+</div><div class="roadmap-items"><span class="roadmap-chip">True 3D DRAM</span><span class="roadmap-chip">IGZO/In2O3 수직 채널</span><span class="roadmap-chip">캐패시터리스 구조</span></div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showTab(name, event) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+</script>
+</body>
+</html>
