@@ -101,12 +101,14 @@
 </header>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab('cxmt', event)">CXMT Commodity DRAM</div>
+  <div class="tab active" onclick="showTab('market', event)" style="color:#1565c0;font-weight:700">📊 시장 판단</div>
+  <div class="tab" onclick="showTab('cxmt', event)">CXMT Commodity DRAM</div>
   <div class="tab" onclick="showTab('3dic', event)">중국 3D IC</div>
   <div class="tab" onclick="showTab('patents', event)">특허 트래커</div>
   <div class="tab" onclick="showTab('papers', event)">논문 트래커</div>
   <div class="tab" onclick="showTab('roadmap', event)">기술 로드맵</div>
   <div class="tab" onclick="showTab('tau', event)" style="color:#c62828;font-weight:700">🆕 화웨이 τ 스케일링</div>
+  <div class="tab" onclick="showTab('history', event)">📋 업데이트 히스토리</div>
 </div>
 
 <div class="content">
@@ -116,7 +118,7 @@
   </div>
 
   <!-- TAB 1: CXMT -->
-  <div id="tab-cxmt" class="section active">
+  <div id="tab-cxmt" class="section">
     <div class="grid-3">
       <div class="card">
         <div class="card-title">현재 양산 노드</div>
@@ -180,6 +182,90 @@
         </div>
       </div>
     </div>
+
+    <!-- CXMT EUV 패널 -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">EUV 기술 현황 및 극복 전략</div>
+        <span class="panel-tag badge-red">수출 통제 대응</span>
+      </div>
+
+      <div style="background:#fce4ec;border-left:4px solid #c62828;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:14px;font-size:13px">
+        <strong style="color:#c62828">현황: CXMT는 EUV 장비 접근 불가</strong><br>
+        <span style="color:#555">미국 BIS 수출 통제로 ASML EUV(NXE/EXE 시리즈) 구매 차단. 수출 통제 이전 구매한 ASML DUV(ArF 이머전, NXT 시리즈)만 보유·운용 중. G3~G4 노드 전체를 DUV + 멀티패터닝으로 구현.</span>
+      </div>
+
+      <table>
+        <thead><tr><th>노드</th><th>리소그래피 방식</th><th>패터닝 기법</th><th>핵심 과제</th><th>글로벌 비교</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>G3 (17.5nm)</strong></td>
+            <td>DUV ArF 이머전</td>
+            <td>SADP / LELE (2중 패터닝)</td>
+            <td>오버레이 오류 누적</td>
+            <td>Samsung 1z: EUV 일부 도입 시점</td>
+          </tr>
+          <tr>
+            <td><strong>G4 (~16nm)</strong></td>
+            <td>DUV ArF 이머전</td>
+            <td>SAQP (4중 패터닝)</td>
+            <td>공정 단계 2배↑, 원가 상승, 수율 압박</td>
+            <td>Micron 1a: DUV SAQP — CXMT 기술적 유사 수준 가능</td>
+          </tr>
+          <tr>
+            <td><strong>G5 (1a급, 개발 중)</strong></td>
+            <td>DUV ArF 이머전</td>
+            <td>SAQP + LELE 혼합 (추정)</td>
+            <td>이론적 한계 접근, 수율 저하 심화</td>
+            <td>Samsung/SK 1a~1b: EUV 6레이어 → CXMT와 격차 확대</td>
+          </tr>
+          <tr>
+            <td><strong>G6+ (추정)</strong></td>
+            <td>DUV 한계 초과 — 대안 필요</td>
+            <td>3D DRAM 전환 또는 자체 EUV</td>
+            <td>현재 DUV로 구현 불가 예상</td>
+            <td>글로벌: High-NA EUV (ASML EXE:5000)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:14px">
+        <div style="font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:10px">EUV 미확보 시 극복 방안 4가지</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+
+          <div style="background:#e8f5e9;border-radius:8px;padding:11px 14px;border-left:3px solid #388e3c">
+            <strong style="color:#2e7d32">① SAQP 멀티패터닝 — 단기 현실적 대안</strong><br>
+            <span style="font-size:12px;color:#555">ArF 이머전 DUV × 4회 노광으로 피치 1/4 감소. Huawei·SMIC가 5nm급에 적용 (특허 출원). 공정 추가로 원가 ~20~30% 상승, 수율 33~40% (CXMT HBM3 2026 상반기 기준). Intel 10nm에서 동일 접근 시 수년 지연 선례 있음.</span>
+          </div>
+
+          <div style="background:#e8f5e9;border-radius:8px;padding:11px 14px;border-left:3px solid #388e3c">
+            <strong style="color:#2e7d32">② 3D DRAM 전환 — 중장기 구조적 우회</strong><br>
+            <span style="font-size:12px;color:#555">IGZO/산화물 반도체 수직 채널 구조는 리소그래피 피치 축소 대신 <em>적층</em>으로 밀도 향상 → EUV 의존도 근본적으로 낮음. IMECAS·Tsinghua 2021년부터 선점. Yole 2026 보고서: 2032~35년 양산 현실적. CXMT가 3D DRAM으로 G5+ 한계 우회 가능성.</span>
+          </div>
+
+          <div style="background:#fff3e0;border-radius:8px;padding:11px 14px;border-left:3px solid #f57c00">
+            <strong style="color:#e65100">③ 자체 EUV 개발 (SMEE + 화웨이) — 장기 리스크 헷지</strong><br>
+            <span style="font-size:12px;color:#555">중국 정부 €370억 투자. SMEE 현재 90nm 양산 가능 / 28nm 이머전 DUV 개발 중. EUV 프로토타입 2025년 초 테스트 시작 (하얼빈공대 광원, 창춘광학 렌즈, SMEE 통합). 생산 가능 EUV 목표: 2028년 (정부), 현실적 전망 2030년 이후 (CSIS 분석). ASML 격차 3~5세대 — 단기 실전 적용 어려움.</span>
+          </div>
+
+          <div style="background:#e3f2fd;border-radius:8px;padding:11px 14px;border-left:3px solid #1976d2">
+            <strong style="color:#1565c0">④ LogicFolding / τ 스케일링 (화웨이) — 아키텍처 레벨 우회</strong><br>
+            <span style="font-size:12px;color:#555">공정 노드 스케일링 대신 3D 수직 적층으로 밀도·성능 향상. Kirin 2026 +55% 트랜지스터 밀도 주장. EUV 없이 1.4nm급 밀도 2031년 목표 (화웨이 자체 발표, 독립 검증 미완료). DRAM 관점: Memory-on-Logic 1.5µm HB pitch — EUV 불필요.</span>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="margin-top:12px;background:#f8f9fa;border-radius:8px;padding:10px 14px">
+        <div style="font-size:12px;font-weight:700;color:#555;margin-bottom:6px">DRAM 설계 관점 핵심 시사점</div>
+        <div style="font-size:12px;color:#555;line-height:1.7">
+          • <strong>단기(2026~28)</strong>: DUV SAQP로 G4~G5 유지 가능하나 삼성/SK 대비 EUV 적용 노드에서 셀 면적·수율 격차 ~1세대 확대 불가피<br>
+          • <strong>중기(2028~30)</strong>: G6+ 진입 시 DUV 한계 — 3D DRAM 전환이 현실적 출구. IGZO 채널 설계 역량이 핵심 변수<br>
+          • <strong>장기(2030+)</strong>: 자체 EUV 양산 또는 3D DRAM 선행 양산 중 하나가 CXMT 기술 자립의 분기점
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- TAB 2: 3D IC -->
@@ -273,6 +359,7 @@
         </div>
       </div>
     </div>
+
   </div>
 
   <!-- TAB 3: 특허 트래커 -->
@@ -539,6 +626,492 @@
         <li><span class="src-type">분석</span><a href="https://augmentedmind.substack.com/p/tau-scaling-how-huawei-is-architecting-around-sanctions" target="_blank">Augmented Mind — Tau Scaling: Architecting Around Sanctions</a></li>
         <li><span class="src-type">북경대</span><a href="https://www.tomshardware.com/tech-industry/semiconductors/peking-university-builds-3d-chip-design-tool-tailored-to-huaweis-logicfolding-architecture" target="_blank">Tom's Hardware — Peking Univ. 3D EDA tool for LogicFolding</a></li>
       </ul>
+    </div>
+  </div>
+
+  <!-- TAB: 시장 판단 -->
+  <div id="tab-market" class="section active">
+
+    <!-- 판단 요약 -->
+    <div style="background:linear-gradient(135deg,#1a237e,#283593);color:white;border-radius:12px;padding:20px 24px;margin-bottom:16px">
+      <div style="font-size:12px;opacity:0.7;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">2026~2030 기술 개발 방향 판단</div>
+      <div style="font-size:22px;font-weight:700;margin-bottom:8px">AI 가속기(HBM) 주도 — 그러나 Commodity는 생존 필수재</div>
+      <div style="font-size:13px;opacity:0.85;line-height:1.7">
+        HBM 매출 비중이 2023년 8% → 2026년 41%로 급등. 3대 메이커 CAPEX의 HBM 전환 가속. 단, Commodity DRAM은 절대 볼륨·캐시카우로 유지 — 기술 투자는 HBM, 이익 기반은 Commodity의 <strong>이중 구조</strong>.
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+        <span style="background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;font-size:12px">✅ HBM: 기술 선도</span>
+        <span style="background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;font-size:12px">⚖️ Commodity: 캐시카우 유지</span>
+        <span style="background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;font-size:12px">🇨🇳 CXMT: Commodity 공세 → HBM 추격</span>
+      </div>
+    </div>
+
+    <!-- 핵심 지표 -->
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">HBM 매출 비중 (전체 DRAM 대비)</div>
+        <div class="card-value">35~45%</div>
+        <div class="card-sub">2026E 추정 범위 · 2023년 8% → 2024년 20% (TrendForce 직접 확인)</div>
+        <span class="card-badge badge-orange">⚠️ 다중 소스 역산 — 직접 출처 없음</span>
+      </div>
+      <div class="card">
+        <div class="card-title">HBM 웨이퍼 점유</div>
+        <div class="card-value">23%</div>
+        <div class="card-sub">2026E · AI가 전체 DRAM 웨이퍼의 20%+ 소비</div>
+        <span class="card-badge badge-orange">Commodity 웨이퍼 압박</span>
+      </div>
+      <div class="card">
+        <div class="card-title">AI 서버 메모리 가격</div>
+        <div class="card-value">+60%</div>
+        <div class="card-sub">2026 Q1 QoQ · 스마트폰 DRAM과 역방향</div>
+        <span class="card-badge badge-red">공급 재배분 진행 중</span>
+      </div>
+    </div>
+
+    <!-- 시장 규모 비교 -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">시장 규모 & 성장률 비교</div>
+        <span class="panel-tag badge-blue">TrendForce · Yole · BofA 2026E</span>
+      </div>
+      <table>
+        <thead><tr><th>구분</th><th>2023 매출</th><th>2025 매출</th><th>2026E 매출</th><th>CAGR</th><th>특징</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>HBM (AI 가속기)</strong></td>
+            <td>~$5B</td>
+            <td>~$35B</td>
+            <td>~$54~60B</td>
+            <td style="color:#c62828;font-weight:700">~28% CAGR</td>
+            <td>SK Hynix 57% 점유, NVIDIA GPU 종속</td>
+          </tr>
+          <tr>
+            <td><strong>Commodity DRAM</strong><br><span style="font-size:11px;color:#888">(DDR5/LPDDR5/서버)</span></td>
+            <td>~$50B</td>
+            <td>~$93B</td>
+            <td>~$70~75B</td>
+            <td style="color:#2e7d32;font-weight:700">~10% CAGR</td>
+            <td>절대 볼륨 1위, 스마트폰·PC 수요 약세</td>
+          </tr>
+          <tr>
+            <td><strong>전체 DRAM 시장</strong></td>
+            <td>~$55B</td>
+            <td>~$128B</td>
+            <td>~$128B</td>
+            <td>~10% CAGR</td>
+            <td>HBM 비중 급등으로 구조 재편 중</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:12px;color:#888">
+        ※ 시장 규모 수치는 리서치사(TrendForce, Yole, BofA, Precedence Research)별 차이 있음. 트렌드 방향 기준으로 해석 권장.<br>
+        ※ <strong>HBM 비중 직접 확인 수치</strong>: 2023년 ~8%, 2024년 20% (TrendForce 2024-07-22 보도자료). 2026E 35~45%는 BofA HBM 전망($54.6B) ÷ TrendForce 총 DRAM 예측($128B) 역산값 — 단일 권위 소스 미확인.
+      </div>
+    </div>
+
+    <!-- CAPEX 방향 -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">메이커별 CAPEX 방향 (2026E)</div>
+        <span class="panel-tag badge-orange">TrendForce 2025-11</span>
+      </div>
+      <table>
+        <thead><tr><th>업체</th><th>2026 CAPEX</th><th>YoY</th><th>HBM 투자 방향</th><th>Commodity 전략</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>SK Hynix</strong></td>
+            <td>$20.5B</td>
+            <td style="color:#c62828">+17%</td>
+            <td>HBM4 M15x fab 증설 · 전략적 1순위</td>
+            <td>DDR5 수익성 유지 (HBM4 램프업 조절)</td>
+          </tr>
+          <tr>
+            <td><strong>Samsung</strong></td>
+            <td>$20.0B</td>
+            <td style="color:#c62828">+11%</td>
+            <td>1C HBM 공정 고도화 · P4L 웨이퍼 소폭 확대</td>
+            <td>Commodity 점유율 방어 병행</td>
+          </tr>
+          <tr>
+            <td><strong>Micron</strong></td>
+            <td>$13.5B</td>
+            <td style="color:#c62828">+23%</td>
+            <td>1-gamma 노드 + TSV 설비 확대 최우선</td>
+            <td>HBM 후발 만회에 집중</td>
+          </tr>
+          <tr>
+            <td><strong>CXMT</strong></td>
+            <td>미공개</td>
+            <td>—</td>
+            <td>HBM2 양산 → HBM3 2026 말 목표</td>
+            <td><strong>Commodity 가격 공세로 시장 점유율 11%</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 수요 신호 -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">수요 신호 — 판단 근거</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#c62828;margin-bottom:8px;text-transform:uppercase">🔥 AI 가속기 강세 신호</div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-date">수요</div>
+              <div class="timeline-content">Microsoft·Google·Meta·Amazon 하이퍼스케일러가 HBM 장기계약으로 공급 선점. AI 서버가 고급 DRAM 70% 흡수.</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-date">가격</div>
+              <div class="timeline-content">서버 DRAM +60% QoQ (2026 Q1). 메이커들이 Commodity 웨이퍼를 HBM으로 전환 → Commodity 공급 부족 발생.</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-date">기술</div>
+              <div class="timeline-content">Hybrid Bonding, TSV, 1-gamma 공정 — 모두 HBM 요구사항이 개발을 주도. 화웨이 τ 스케일링도 Memory-on-Logic 3D 통합 지향.</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-date">CAPEX</div>
+              <div class="timeline-content">SK Hynix +17%, Micron +23% — 증분 투자의 대부분이 HBM/TSV 설비.</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#2e7d32;margin-bottom:8px;text-transform:uppercase">📦 Commodity 생존 신호</div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-date">볼륨</div>
+              <div class="timeline-content">Commodity는 절대 비트 수에서 HBM 압도. 스마트폰·PC·서버 DDR5 시장 합산 여전히 전체 DRAM의 59%.</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-date">CXMT</div>
+              <div class="timeline-content">중국 내 Commodity 과잉 공급 우려. CXMT G4 양산 시 DDR5/LPDDR5X 가격 압박 → 한국 메이커 마진 압박.</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-date">PC/폰</div>
+              <div class="timeline-content">스마트폰 -12.9%, PC -11.3% (2026E). 수요 약세지만 AI PC·온디바이스 AI로 회복 기대 (2027~).</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-date">이익</div>
+              <div class="timeline-content">Commodity 고마진 시기에 R&D 비용 충당. HBM 단독으론 캐시플로우 불안정 — 포트폴리오 유지 필요.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DRAM 설계 관점 판단 -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">DRAM 설계 관점 — 기술 개발 우선순위 판단</div></div>
+      <table>
+        <thead><tr><th>기술 영역</th><th>Commodity 관련성</th><th>HBM/AI 관련성</th><th>판단</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>BWL / 6F² 셀 스케일링</strong></td>
+            <td>★★★★★ 핵심</td>
+            <td>★★★ 공용</td>
+            <td><span class="card-badge badge-green">Commodity 주도</span></td>
+          </tr>
+          <tr>
+            <td><strong>TSV / Hybrid Bonding</strong></td>
+            <td>★ 간접</td>
+            <td>★★★★★ 필수</td>
+            <td><span class="card-badge badge-red">HBM 주도</span></td>
+          </tr>
+          <tr>
+            <td><strong>4F² / VG / IGZO</strong></td>
+            <td>★★ 미래 비용</td>
+            <td>★★★★ 3D DRAM 기반</td>
+            <td><span class="card-badge badge-red">HBM/3D 주도</span></td>
+          </tr>
+          <tr>
+            <td><strong>DDR5 / LPDDR5X 인터페이스</strong></td>
+            <td>★★★★★ 직결</td>
+            <td>★★ 간접</td>
+            <td><span class="card-badge badge-green">Commodity 주도</span></td>
+          </tr>
+          <tr>
+            <td><strong>캐패시터 유전체 (ZrO2→TiO2)</strong></td>
+            <td>★★★★ 중요</td>
+            <td>★★★ 공용</td>
+            <td><span class="card-badge badge-blue">공용 — Commodity가 볼륨 명분</span></td>
+          </tr>
+          <tr>
+            <td><strong>On-die ECC / RAS 기능</strong></td>
+            <td>★★★ DDR5 요구</td>
+            <td>★★★★★ HBM 신뢰성</td>
+            <td><span class="card-badge badge-orange">공용 — HBM이 사양 선도</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 시나리오 -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">시나리오별 예측 (2026~2030)</div></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:#e8f5e9;border-radius:8px;padding:14px 16px;border-left:4px solid #388e3c">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="color:#2e7d32">시나리오 A: AI 가속 지속 (가능성 높음)</strong>
+            <span class="card-badge badge-green">확률 ~55%</span>
+          </div>
+          <span style="font-size:13px;color:#555">NVIDIA·AMD·커스텀 AI 칩 수요 지속 → HBM4/4E 주도. 메이커 CAPEX HBM 집중 심화. CXMT도 HBM3→3E 추격. <strong>설계 우선순위: TSV·Hybrid Bonding·고단 적층·On-die ECC.</strong></span>
+        </div>
+        <div style="background:#fff3e0;border-radius:8px;padding:14px 16px;border-left:4px solid #f57c00">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="color:#e65100">시나리오 B: AI 수요 조정 + Commodity 회복 (중립)</strong>
+            <span class="card-badge badge-orange">확률 ~35%</span>
+          </div>
+          <span style="font-size:13px;color:#555">AI 투자 사이클 조정 → HBM 공급과잉. AI PC·온디바이스 AI로 LPDDR5X/DDR5 수요 반등. CXMT Commodity 공세 본격화. <strong>설계 우선순위: 원가절감 스케일링·EUV·셀 면적 축소.</strong></span>
+        </div>
+        <div style="background:#fce4ec;border-radius:8px;padding:14px 16px;border-left:4px solid #c62828">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="color:#c62828">시나리오 C: 중국 규제 심화 + 시장 분리</strong>
+            <span class="card-badge badge-red">확률 ~10%</span>
+          </div>
+          <span style="font-size:13px;color:#555">미국 대중 반도체 수출 규제 강화 → CXMT HBM 봉쇄. 한국·미국 업체 HBM 독점 심화. 중국은 IGZO/EUV 없는 루트로 독자 3D DRAM 개발 가속. <strong>설계 우선순위: 이원화 (글로벌 HBM4 vs 중국 IGZO 3D).</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CXL -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">CXL(Compute Express Link) — 수요 기반 예측</div>
+        <span class="panel-tag badge-blue">MarketsandMarkets · Introl · TradingKey 2026</span>
+      </div>
+      <div class="grid-2" style="margin-bottom:14px">
+        <div class="card">
+          <div class="card-title">CXL 메모리 시장 규모 (2026E)</div>
+          <div class="card-value">$2.25B</div>
+          <div class="card-sub">2030년 $7.09B · CAGR 33.2%</div>
+          <span class="card-badge badge-blue">2028년 $15B 전망 (DRAM 비중 $12B+)</span>
+        </div>
+        <div class="card">
+          <div class="card-title">서버 CXL 탑재율 (2026E)</div>
+          <div class="card-value">30%</div>
+          <div class="card-sub">신규 Tier-1 서버 대부분 CXL 슬롯 포함</div>
+          <span class="card-badge badge-orange">Microsoft: 2025-11 첫 CXL 클라우드 인스턴스 출시</span>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>업체</th><th>CXL 제품/로드맵</th><th>출시 시기</th><th>특징</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Samsung</strong></td>
+            <td>Pangea v3 (CXL 3.2)</td>
+            <td>2026 내</td>
+            <td>광통신 지원, 포트당 대역폭 확대</td>
+          </tr>
+          <tr>
+            <td><strong>SK Hynix</strong></td>
+            <td>2세대 CXL 메모리 익스팬더</td>
+            <td>2027~2028</td>
+            <td>DDR6 기반, 메모리 풀링 지원</td>
+          </tr>
+          <tr>
+            <td><strong>Micron</strong></td>
+            <td>H3 Falcon CXL</td>
+            <td>양산 중</td>
+            <td>그래프 DB 대비 20× 성능, 비집계 메모리</td>
+          </tr>
+          <tr>
+            <td><strong>CXMT</strong></td>
+            <td>미공개 (DDR5 기반 CXL 타겟 추정)</td>
+            <td>2027+ (추정)</td>
+            <td>Commodity 기반 CXL 저가 공략 가능</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+        <div style="background:#e8f5e9;border-radius:8px;padding:10px 14px;border-left:3px solid #388e3c;font-size:13px">
+          <strong style="color:#2e7d32">✅ DRAM 설계에 주는 의미</strong><br>
+          <span style="color:#555">CXL은 Commodity DRAM(DDR5)를 서버 메모리 풀로 확장 — Commodity의 새 수요처. 단, HBM처럼 고마진 제품은 아님. CXL 확산 시 DDR5 bit 수요 +15~20% 추가 효과 예상 (Micron 백서). <strong>인터페이스 설계 관점에서는 CXL 2.0/3.0 전기적 특성 최적화가 차세대 DDR5/DDR6 설계 요건에 포함.</strong>
+          </span>
+        </div>
+        <div style="background:#fff3e0;border-radius:8px;padding:10px 14px;border-left:3px solid #f57c00;font-size:13px">
+          <strong style="color:#e65100">⚠️ 리스크</strong><br>
+          <span style="color:#555">CXL 생태계가 HBM 대비 늦게 성숙 → 2026~2027년은 아직 틈새. PCIe 6.0 보급 속도에 의존. 화웨이 UnifiedBus(τ 스케일링)가 CXL 유사 아키텍처를 자체 개발 중 — 중국 시장 내 CXL 표준 비채택 가능성 존재.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3D IC DRAM -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">3D IC DRAM — 수요 기반 예측 및 상용화 타임라인</div>
+        <span class="panel-tag badge-red">Yole "Next-Gen DRAM 2026" · allpcb · Tom's Hardware</span>
+      </div>
+      <div class="grid-3" style="margin-bottom:14px">
+        <div class="card">
+          <div class="card-title">3D DRAM 양산 현실적 시점</div>
+          <div class="card-value">2032~35</div>
+          <div class="card-sub">Yole Group 2026 보고서 기준</div>
+          <span class="card-badge badge-red">당초 예상보다 2~3년 지연</span>
+        </div>
+        <div class="card">
+          <div class="card-title">3D DRAM 잠재 시장 (2030E)</div>
+          <div class="card-value">~$100B</div>
+          <div class="card-sub">전체 DRAM 시장 대체 시나리오</div>
+          <span class="card-badge badge-orange">2030년까지 본격화 불확실</span>
+        </div>
+        <div class="card">
+          <div class="card-title">CBA 4F² 셀 도입 시점</div>
+          <div class="card-value">2027+</div>
+          <div class="card-sub">Cross-Bar Architecture + Hybrid Bonding</div>
+          <span class="card-badge badge-blue">HBM4E 이후 적용 시작</span>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>연도</th><th>기술 이벤트</th><th>업체</th><th>DRAM 설계 영향</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>2025~26</strong></td>
+            <td>VCT(수직 채널 트랜지스터) 초기 버전 시제품</td>
+            <td>Samsung, SK Hynix</td>
+            <td>수직 게이트 구조 셀 설계 R&D 진입</td>
+          </tr>
+          <tr>
+            <td><strong>2027</strong></td>
+            <td>CBA(Cross-Bar) 아키텍처 + 4F² 셀 도입 시작</td>
+            <td>Samsung, SK Hynix</td>
+            <td>Peripheral-Array 분리 설계, Hybrid Bonding 필수화</td>
+          </tr>
+          <tr>
+            <td><strong>2027~28</strong></td>
+            <td>IGZO 수직 채널 소자 수준 검증 완료 (추정)</td>
+            <td>IMECAS, Tsinghua, Huawei</td>
+            <td>산화물 반도체 채널 설계 기술 축적 필요</td>
+          </tr>
+          <tr>
+            <td><strong>2029~30</strong></td>
+            <td>Samsung "Full 3D DRAM" (캐패시터 포함 전체 스택)</td>
+            <td>Samsung</td>
+            <td>비트라인·워드라인 수직 라우팅 설계 패러다임 전환</td>
+          </tr>
+          <tr>
+            <td><strong>2032~35</strong></td>
+            <td>3D DRAM 양산 진입 (Yole 현실적 전망)</td>
+            <td>Samsung / SK Hynix / 중국?</td>
+            <td>현재 6F² BWL 기반 설계 완전 대체</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+        <div style="background:#e3f2fd;border-radius:8px;padding:10px 14px;border-left:3px solid #1976d2;font-size:13px">
+          <strong style="color:#1565c0">📌 DRAM 설계 관점 시사점</strong><br>
+          <span style="color:#555">2032년 이전까지 현재 6F² BWL 스케일링이 메인스트림 유지. 3D DRAM은 장비·공정 요구가 급변 — 지금 IGZO/산화물 채널·4F² 셀 설계 역량을 축적해야 2030년 전환기에 대응 가능. 중국(IMECAS·Tsinghua)이 IGZO 연구를 2021년부터 선점한 이유.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 통합 시나리오: CXL + 3D DRAM + HBM + Commodity -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">통합 시나리오 — CXL · 3D DRAM · HBM · Commodity (2026~2035)</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:#e8f5e9;border-radius:8px;padding:14px 16px;border-left:4px solid #388e3c">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="color:#2e7d32">시나리오 1: HBM → CXL → 3D DRAM 순차 전환 (가능성 높음)</strong>
+            <span class="card-badge badge-green">확률 ~50%</span>
+          </div>
+          <table style="margin-top:8px">
+            <tbody>
+              <tr><td style="color:#888;font-size:12px;width:80px">2026~28</td><td style="font-size:13px">HBM4/4E 주도. CXL 서버 탑재율 30%→50%로 증가. Commodity DDR5 CXL 수요처 확보.</td></tr>
+              <tr><td style="color:#888;font-size:12px">2028~30</td><td style="font-size:13px">CXL 메모리 풀링 본격화 ($15B+). HBM4E·CXL 병행 구조. 3D DRAM 4F² 초기 적용 (HBM 베이스다이).</td></tr>
+              <tr><td style="color:#888;font-size:12px">2030~35</td><td style="font-size:13px">3D DRAM 양산 진입. HBM5 = 3D DRAM + Hybrid Bonding 통합. CXL은 Commodity 확장 채널로 안착. <strong>설계 우선순위: 수직 채널·4F²·IGZO·광대역 I/O.</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="background:#fff3e0;border-radius:8px;padding:14px 16px;border-left:4px solid #f57c00">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="color:#e65100">시나리오 2: CXL이 HBM을 보완·대체 (중립)</strong>
+            <span class="card-badge badge-orange">확률 ~30%</span>
+          </div>
+          <table style="margin-top:8px">
+            <tbody>
+              <tr><td style="color:#888;font-size:12px;width:80px">트리거</td><td style="font-size:13px">AI 추론(inference) 시장 확대 → 대용량·저비용 메모리 수요 증가. HBM의 고비용 대비 CXL 메모리 풀링이 경쟁력 확보.</td></tr>
+              <tr><td style="color:#888;font-size:12px">결과</td><td style="font-size:13px">Commodity DDR5 CXL 수요 폭증 → CXMT 수혜 가능. HBM 성장세 둔화. 중간 계층 메모리(CXL) 설계 중요성 급부상.</td></tr>
+              <tr><td style="color:#888;font-size:12px">설계 방향</td><td style="font-size:13px"><strong>CXL 인터페이스 최적화·저레이턴시 DDR6·메모리 컨트롤러 설계가 핵심 역량으로 부상.</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="background:#fce4ec;border-radius:8px;padding:14px 16px;border-left:4px solid #c62828">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <strong style="color:#c62828">시나리오 3: 3D DRAM 조기 도래 + 시장 구조 파괴 (낮음)</strong>
+            <span class="card-badge badge-red">확률 ~20%</span>
+          </div>
+          <table style="margin-top:8px">
+            <tbody>
+              <tr><td style="color:#888;font-size:12px;width:80px">트리거</td><td style="font-size:13px">IGZO/산화물 반도체 수율 문제 예상보다 조기 해결 → 2029~30 양산 가능. 중국(IMECAS·화웨이) 선행 상용화 충격.</td></tr>
+              <tr><td style="color:#888;font-size:12px">결과</td><td style="font-size:13px">현재 6F² BWL 기반 설계 자산 급격히 퇴화. HBM도 3D DRAM 기반으로 2세대 전환 압박. CXL은 3D DRAM 인터페이스로 재정의.</td></tr>
+              <tr><td style="color:#888;font-size:12px">설계 방향</td><td style="font-size:13px"><strong>IGZO 채널 설계·수직 라우팅·4F² 셀 설계 역량 보유 여부가 경쟁력 결정.</strong> 중국 선점 리스크 대응 필요.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 기술-시장 매트릭스 -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">기술-시장 매트릭스 — 개발 우선순위 판단</div></div>
+      <table>
+        <thead><tr><th>기술</th><th>Commodity</th><th>HBM/AI</th><th>CXL</th><th>3D DRAM</th><th>우선순위</th></tr></thead>
+        <tbody>
+          <tr><td><strong>6F² BWL 스케일링</strong></td><td>★★★★★</td><td>★★★</td><td>★★★</td><td>★ (대체됨)</td><td><span class="card-badge badge-green">단기 핵심 (2026~28)</span></td></tr>
+          <tr><td><strong>TSV / Hybrid Bonding</strong></td><td>★</td><td>★★★★★</td><td>★★</td><td>★★★★★</td><td><span class="card-badge badge-red">장기 필수 — 지금 투자</span></td></tr>
+          <tr><td><strong>4F² / VCT / IGZO</strong></td><td>★★</td><td>★★★★</td><td>★★</td><td>★★★★★</td><td><span class="card-badge badge-red">장기 게임체인저</span></td></tr>
+          <tr><td><strong>DDR5/DDR6 인터페이스</strong></td><td>★★★★★</td><td>★★</td><td>★★★★★</td><td>★★★</td><td><span class="card-badge badge-blue">CXL 확산 시 재부상</span></td></tr>
+          <tr><td><strong>On-die ECC / RAS</strong></td><td>★★★</td><td>★★★★★</td><td>★★★★</td><td>★★★★★</td><td><span class="card-badge badge-orange">모든 시나리오 공통</span></td></tr>
+          <tr><td><strong>캐패시터 유전체 (TiO2 등)</strong></td><td>★★★★</td><td>★★★</td><td>★★★</td><td>★★★★</td><td><span class="card-badge badge-green">단기~중기 공통</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="background:#e3f2fd;border-radius:8px;padding:12px 16px;font-size:12px;color:#1565c0;margin-bottom:16px">
+      <strong>📌 데이터 출처:</strong> TrendForce (CAPEX·가격), Yole Group "Next-Gen DRAM 2026" (3D DRAM 타임라인), BofA (HBM $54.6B 2026E), MarketsandMarkets·Introl (CXL 시장), TradingKey (CXL vs HBM 로드맵), Micron 백서 (CXL DRAM 영향), Tom's Hardware (SK Hynix 2031 로드맵), IDC (스마트폰·PC 수요). 예측 확률은 Claude 분석 기반이며 투자 조언이 아님.
+    </div>
+  </div>
+
+  <!-- TAB: 업데이트 히스토리 -->
+  <div id="tab-history" class="section">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">업데이트 히스토리</div>
+        <span class="panel-tag badge-blue">매주 월요일 자동 업데이트</span>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">2026-06-28</div>
+          <div class="timeline-content">
+            <strong>화웨이 τ 스케일링 탭 추가</strong><br>
+            IEEE ISCAS 2026 발표 분석: LogicFolding, +55% 트랜지스터 밀도(238 MTr/mm²), 1.5µm HB pitch, Ascend 로드맵 및 DRAM 설계 시사점 추가. GitHub Pages 배포.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026-06-27</div>
+          <div class="timeline-content">
+            <strong>대시보드 최초 생성</strong><br>
+            CXMT Commodity DRAM (G3/G4, 제품 라인업, 셀 구조), 중국 3D IC (YMTC·Huawei·IMECAS·Tsinghua), 특허 트래커 (US 8건 확인), 논문 트래커 (2022~2026), 기술 로드맵 탭 구성. 주간 자동 업데이트 스케줄 등록(매주 월요일 09:00).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">조사 대상 고정 항목</div></div>
+      <table>
+        <thead><tr><th>카테고리</th><th>추적 대상</th><th>주요 DB</th></tr></thead>
+        <tbody>
+          <tr><td>CXMT 특허</td><td>US/CN 신규 등록·공개 특허</td><td>Google Patents, USPTO</td></tr>
+          <tr><td>YMTC 특허</td><td>Hybrid bonding, Xtacking 관련</td><td>WIPO, Google Patents</td></tr>
+          <tr><td>중국 논문</td><td>IEDM, VLSI, ISSCC, arXiv cs.AR</td><td>IEEE Xplore, arXiv</td></tr>
+          <tr><td>글로벌 동향</td><td>Samsung, SK Hynix, Micron 발표</td><td>공식 뉴스룸, TrendForce</td></tr>
+          <tr><td>공정 수치</td><td>EUV 레이어 수, TSV 피치, EOT, 셀 면적</td><td>TechInsights (유료)</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
